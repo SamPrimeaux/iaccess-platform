@@ -1,0 +1,13 @@
+name = "iaccess-platform"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+[env.production]
+name = "iaccess-platform"
+account_id = "ede6590ac0d2fb7daf155b35653457b2"
+
+[env.dev]
+name = "iaccess-platform-dev"
+account_id = "ede6590ac0d2fb7daf155b35653457b2"
+workers_dev = true

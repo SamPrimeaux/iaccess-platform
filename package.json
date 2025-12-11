@@ -1,0 +1,16 @@
+{
+  "name": "iaccess-platform",
+  "version": "1.0.0",
+  "description": "Multi-page HTML deployment",
+  "scripts": {
+    "deploy": "./deploy.sh",
+    "deploy:dev": "wrangler deploy --env dev",
+    "deploy:prod": "wrangler deploy --env production",
+    "deploy:github": "./deploy-to-github-pages.sh",
+    "preview": "wrangler dev"
+  },
+  "devDependencies": {
+    "wrangler": "^3.0.0",
+    "@cloudflare/workers-types": "^4.20241106.0"
+  }
+}
