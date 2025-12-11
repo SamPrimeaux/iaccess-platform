@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflows - iAccess Platform</title>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iAccess - Enterprise Intelligence Platform</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* iAccess Brand Colors - Sophisticated Tech */
+      --ia-primary: #0066FF;
+      --ia-primary-dark: #0052CC;
+      --ia-primary-light: #3385FF;
+      --ia-accent: #00E5A0;
+      --ia-accent-dark: #00B380;
+      --ia-warning: #FFB020;
+      --ia-error: #FF3B57;
+      --ia-success: #00E5A0;
+      
+      /* Neural Network Theme */
+      --bg-primary: #0A0E1A;
+      --bg-secondary: #111827;
+      --bg-elevated: #1A2332;
+      --bg-card: #141B2B;
+      --bg-hover: #1E2A3F;
+      
+      /* Text & Borders */
+      --text-primary: #F9FAFB;
+      --text-secondary: #9CA3AF;
+      --text-muted: #6B7280;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(0, 102, 255, 0.4);
+      
+      /* Shadows & Glows */
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+      --glow-primary: 0 0 20px rgba(0, 102, 255, 0.4);
+      --glow-accent: 0 0 20px rgba(0, 229, 160, 0.4);
+      
+      /* Spacing */
+      --space-xs: 0.5rem;
+      --space-sm: 0.75rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2rem;
+      --space-2xl: 3rem;
+      
+      /* Layout */
+      --sidebar-width: 280px;
+      --header-height: 72px;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Animated Neural Network Background */
+    #neural-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .app-container {
+      display: flex;
+      height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ============================================
+       SIDEBAR WITH CUSTOM ICONS
+       ============================================ */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--ia-primary) 0%, transparent 50%, var(--ia-accent) 100%);
+      opacity: 0.3;
+    }
+
+    .sidebar-header {
+      padding: var(--space-xl);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .brand:hover {
+      transform: translateX(4px);
+    }
+
+    /* Custom iAccess Logo SVG */
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      position: relative;
+      animation: logoGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes logoGlow {
+      0%, 100% { filter: drop-shadow(0 0 8px rgba(0, 102, 255, 0.6)); }
+      50% { filter: drop-shadow(0 0 16px rgba(0, 229, 160, 0.8)); }
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-name {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--ia-primary) 0%, var(--ia-accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .brand-tagline {
+      font-size: 0.6875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Navigation */
+    .sidebar-nav {
+      flex: 1;
+      padding: var(--space-lg);
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .nav-section-title {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      padding: 0 var(--space-md);
+      margin-bottom: var(--space-sm);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-section-title::before {
+      content: '';
+      width: 3px;
+      height: 12px;
+      background: linear-gradient(180deg, var(--ia-primary), var(--ia-accent));
+      border-radius: 2px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: 0.875rem var(--space-md);
+      border-radius: 12px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 4px;
+      position: relative;
+      overflow: hidden;
+      font-weight: 500;
+      font-size: 0.9375rem;
+    }
+
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--ia-primary), var(--ia-accent));
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+      padding-left: calc(var(--space-md) + 8px);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(90deg, rgba(0, 102, 255, 0.15) 0%, transparent 100%);
+      color: var(--ia-primary);
+      font-weight: 600;
+      border-left: 3px solid var(--ia-primary);
+      box-shadow: var(--glow-primary);
+    }
+
+    .nav-item.active::before {
+      transform: scaleY(1);
+    }
+
+    /* Custom Navigation Icons */
+    .nav-icon {
+      width: 24px;
+      height: 24px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .nav-icon svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--ia-primary);
+      color: white;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 10px;
+      box-shadow: var(--glow-primary);
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+      padding: var(--space-lg);
+      border-top: 1px solid var(--border);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-elevated);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .user-profile:hover {
+      background: var(--bg-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--ia-primary), var(--ia-accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: var(--glow-primary);
+    }
+
+    .user-info {
+      flex: 1;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.9375rem;
+      color: var(--text-primary);
+    }
+
+    .user-role {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ============================================
+       MAIN CONTENT AREA
+       ============================================ */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top Header */
+    .top-header {
+      height: var(--header-height);
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 0 var(--space-xl);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .top-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--ia-primary) 50%, transparent);
+      opacity: 0.3;
+    }
+
+    /* Search Bar */
+    .search-container {
+      flex: 1;
+      max-width: 560px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.875rem 1rem 0.875rem 3rem;
+      color: var(--text-primary);
+      font-size: 0.9375rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--ia-primary);
+      background: var(--bg-card);
+      box-shadow: 0 0 0 4px rgba(0, 102, 255, 0.1), var(--glow-primary);
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Header Actions */
+    .header-actions {
+      display: flex;
+      gap: var(--space-md);
+      align-items: center;
+    }
+
+    .header-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      color: var(--text-secondary);
+    }
+
+    .header-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--ia-primary);
+      color: var(--ia-primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-btn.active {
+      background: var(--ia-primary);
+      border-color: var(--ia-primary);
+      color: white;
+      box-shadow: var(--glow-primary);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--ia-error);
+      color: white;
+      font-size: 0.625rem;
+      font-weight: 700;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--bg-secondary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+    /* Page Content */
+    .page-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-xl);
+      background: var(--bg-primary);
+    }
+
+    .content-wrapper {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* Page Header */
+    .page-header {
+      margin-bottom: var(--space-xl);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .page-header-left h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: var(--space-xs);
+      background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .page-header-left p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .page-header-right {
+      display: flex;
+      gap: var(--space-md);
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 0.875rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--ia-primary), var(--ia-primary-dark));
+      color: white;
+      box-shadow: var(--glow-primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 102, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+      border-color: var(--ia-primary);
+      transform: translateY(-2px);
+    }
+
+    /* ============================================
+       STATS GRID
+       ============================================ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--ia-primary), var(--ia-accent));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--ia-primary);
+    }
+
+    .stat-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: var(--space-md);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .stat-icon.primary {
+      background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 102, 255, 0.05));
+      color: var(--ia-primary);
+      box-shadow: 0 0 20px rgba(0, 102, 255, 0.3);
+    }
+
+    .stat-icon.accent {
+      background: linear-gradient(135deg, rgba(0, 229, 160, 0.2), rgba(0, 229, 160, 0.05));
+      color: var(--ia-accent);
+      box-shadow: 0 0 20px rgba(0, 229, 160, 0.3);
+    }
+
+    .stat-icon.warning {
+      background: linear-gradient(135deg, rgba(255, 176, 32, 0.2), rgba(255, 176, 32, 0.05));
+      color: var(--ia-warning);
+      box-shadow: 0 0 20px rgba(255, 176, 32, 0.3);
+    }
+
+    .stat-change {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .stat-change.positive {
+      background: rgba(0, 229, 160, 0.1);
+      color: var(--ia-accent);
+    }
+
+    .stat-change.negative {
+      background: rgba(255, 59, 87, 0.1);
+      color: var(--ia-error);
+    }
+
+    .stat-body {
+      margin-bottom: var(--space-sm);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 4px;
+    }
+
+    .stat-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: var(--space-sm);
+      border-top: 1px solid var(--border);
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    /* ============================================
+       CHARTS SECTION
+       ============================================ */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--space-lg);
+      margin-bottom: var(--space-xl);
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: var(--space-lg);
+      transition: all 0.3s ease;
+    }
+
+    .chart-card.large {
+      grid-column: span 8;
+    }
+
+    .chart-card.small {
+      grid-column: span 4;
+    }
+
+    .chart-card:hover {
+      border-color: var(--ia-primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .chart-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .chart-subtitle {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .chart-filters {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .filter-btn {
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .filter-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.active {
+      background: var(--ia-primary);
+      color: white;
+      border-color: var(--ia-primary);
+      box-shadow: var(--glow-primary);
+    }
+
+    .chart-body {
+      position: relative;
+      height: 320px;
+    }
+
+    /* ============================================
+       DATA TABLE
+       ============================================ */
+    .data-table-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .table-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .table-actions {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table thead {
+      background: var(--bg-elevated);
+    }
+
+    .data-table th {
+      padding: 1rem var(--space-lg);
+      text-align: left;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .data-table td {
+      padding: 1rem var(--space-lg);
+      border-top: 1px solid var(--border);
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+
+    .data-table tbody tr {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--bg-elevated);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .status-badge.success {
+      background: rgba(0, 229, 160, 0.1);
+      color: var(--ia-accent);
+    }
+
+    .status-badge.warning {
+      background: rgba(255, 176, 32, 0.1);
+      color: var(--ia-warning);
+    }
+
+    .status-badge.error {
+      background: rgba(255, 59, 87, 0.1);
+      color: var(--ia-error);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    /* ============================================
+       ANIMATIONS
+       ============================================ */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stat-card, .chart-card, .table-card {
+      animation: slideIn 0.6s ease-out backwards;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+    /* ============================================
+       SCROLLBAR
+       ============================================ */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--bg-hover);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--ia-primary);
+    }
+
+    /* ============================================
+       RESPONSIVE
+       ============================================ */
+    @media (max-width: 1200px) {
+      .chart-card.large {
+        grid-column: span 12;
+      }
+      .chart-card.small {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: none;
+      }
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .chart-card.small {
+        grid-column: span 12;
+      }
+    }
+  </style>
+
+</head>
+<body>
+  <canvas id="neural-bg"></canvas>
+  
+  <div class="app-container">
+    <!-- Sidebar (same as dashboard) -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect width="32" height="32" rx="6" fill="url(#logoGradient)"/>
+            <defs>
+              <linearGradient id="logoGradient" x1="0" y1="0" x2="32" y2="32">
+                <stop offset="0%" stop-color="#0066FF"/>
+                <stop offset="100%" stop-color="#00E5A0"/>
+              </linearGradient>
+            </defs>
+            <text x="16" y="22" font-family="Inter" font-size="18" font-weight="700" fill="white" text-anchor="middle">iA</text>
+          </svg>
+          <span class="logo-text">iAccess</span>
+        </div>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <div class="nav-section">
+          <div class="nav-section-title">Core</div>
+          <a href="/" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10L10 3L17 10M7 10V17H13V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Dashboard</span>
+          </a>
+          <a href="/analytics" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 3V17H17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M7 12L10 9L13 12L17 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Analytics</span>
+          </a>
+          <a href="/iaccess-ai-gateway" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/><path d="M10 6V10L13 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>AI Gateway Pro</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Services</div>
+          <a href="/iaccess-browser-rendering" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M3 8H17" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span>Browser Rendering</span>
+          </a>
+          <a href="/vectorize" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 3L3 7V13L10 17L17 13V7L10 3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M10 3V17" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span>Vectorize</span>
+          </a>
+          <a href="/workflows" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10H17M10 3V17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="10" cy="10" r="2" fill="currentColor"/></svg>
+            <span>Workflows</span>
+          </a>
+          <a href="/email-routing" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="10" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M3 7L10 11L17 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Email Routing</span>
+          </a>
+          <a href="/queues" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="9" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="14" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span>Queues</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Storage</div>
+          <a href="/d1-databases" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M7 8H13M7 11H13M7 14H11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>D1 Databases</span>
+          </a>
+          <a href="/r2-storage" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="14" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M7 7H13V13H7V7Z" stroke="currentColor" stroke-width="1.5"/></svg>
+            <span>R2 Storage</span>
+          </a>
+          <a href="/kv-namespaces" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="3" y="4" width="14" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><path d="M7 8L10 11L13 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>KV Namespaces</span>
+          </a>
+        </div>
+        
+        <div class="nav-section">
+          <div class="nav-section-title">Settings</div>
+          <a href="/integrations" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M10 1V3M10 17V19M19 10H17M3 10H1M16.364 3.636L14.95 5.05M5.05 14.95L3.636 16.364M16.364 16.364L14.95 14.95M5.05 5.05L3.636 3.636" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Integrations</span>
+          </a>
+          <a href="/settings" class="nav-item">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 1V3M10 17V19M19 10H17M3 10H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <span>Settings</span>
+          </a>
+        </div>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">SP</div>
+          <div class="user-details">
+            <div class="user-name">Sam Primeaux</div>
+            <div class="user-role">Enterprise Admin</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    
+    <!-- Main Content -->
+    <main class="main-content">
+      <header class="main-header">
+        <h1 class="page-title">Workflows</h1>
+        <div class="header-actions">
+          <button class="btn btn-secondary">Export</button>
+          <button class="btn btn-primary">New</button>
+        </div>
+      </header>
+      
+      <div class="content-area">
+        <div class="page-description">
+          <p>Automation and orchestration</p>
+        </div>
+        
+        <!-- Page-specific content will go here -->
+        <div class="content-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3>Overview</h3>
+            </div>
+            <div class="card-body">
+              <p>This page provides management and monitoring for Workflows.</p>
+              <p style="margin-top: 1rem; color: var(--text-secondary);">Full functionality coming soon...</p>
+            </div>
+          </div>
+          
+          <div class="card">
+            <div class="card-header">
+              <h3>Quick Stats</h3>
+            </div>
+            <div class="card-body">
+              <div class="stat-grid">
+                <div class="stat-item">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Active</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-value">$0</div>
+                  <div class="stat-label">Cost</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  
+  
+  <script>
+    // Highlight current page in navigation
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPath = window.location.pathname;
+      document.querySelectorAll('.nav-item').forEach(item => {
+        if (item.getAttribute('href') === currentPath || 
+            (currentPath === '/' && item.getAttribute('href') === '/')) {
+          item.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
