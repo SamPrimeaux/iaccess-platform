@@ -1096,5 +1096,42 @@
       });
     });
   </script>
+
+  <script>
+    // Navigation handler - works for both GitHub Pages and Cloudflare Workers
+    (function() {
+      const isGitHubPages = window.location.hostname.includes('github.io');
+      const currentPath = window.location.pathname;
+      const currentFile = currentPath.split('/').pop() || 'index.html';
+      
+      // Update all nav links based on current environment
+      document.querySelectorAll('.nav-item').forEach(item => {
+        if (item.tagName === 'A') {
+          const href = item.getAttribute('href');
+          
+          // Convert GitHub Pages links to Workers links if on Workers
+          if (!isGitHubPages && href.endsWith('.html')) {
+            const newHref = href.replace('.html', '').replace('index.html', '/');
+            item.setAttribute('href', newHref);
+          }
+          
+          // Convert Workers links to GitHub Pages links if on GitHub Pages
+          if (isGitHubPages && !href.endsWith('.html') && href !== '/') {
+            item.setAttribute('href', href.substring(1) + '.html');
+          }
+          
+          // Set active state
+          const itemFile = item.getAttribute('href').split('/').pop() || 'index.html';
+          if (itemFile === currentFile || 
+              (currentFile === 'index.html' && item.getAttribute('href') === '/') ||
+              (currentFile === 'index.html' && item.getAttribute('href') === 'index.html')) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
+          }
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
