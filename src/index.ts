@@ -12,15 +12,12 @@ export default {
     const url = new URL(request.url);
     let path = url.pathname;
     
-    // Remove trailing slash
     if (path !== "/" && path.endsWith("/")) {
       path = path.slice(0, -1);
     }
     
-    // Find matching route
     let htmlFile = ROUTES[path] || ROUTES["/"] || "index.html";
     
-    // If direct file request, use it
     if (path.endsWith(".html")) {
       htmlFile = path.substring(1);
     }
