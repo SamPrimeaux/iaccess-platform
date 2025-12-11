@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>iAccess - Browser Rendering</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --ia-primary: #0066FF;
+      --ia-accent: #00E5A0;
+      --ia-warning: #FFB020;
+      --ia-purple: #8B5CF6;
+      
+      --bg-primary: #0A0E1A;
+      --bg-secondary: #111827;
+      --bg-elevated: #1A2332;
+      --bg-card: #141B2B;
+      --bg-hover: #1E2A3F;
+      
+      --text-primary: #F9FAFB;
+      --text-secondary: #9CA3AF;
+      --text-muted: #6B7280;
+      --border: rgba(255, 255, 255, 0.08);
+      
+      --glow-primary: 0 0 20px rgba(0, 102, 255, 0.4);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      padding: 2rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header .emoji {
+      display: inline-block;
+      font-size: 3rem;
+      margin-right: 1rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .page-header p {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      margin-left: 5rem;
+    }
+
+    .section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+    }
+
+    .api-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .api-card {
+      background: var(--bg-elevated);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .api-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--ia-primary), var(--ia-accent));
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .api-card:hover {
+      border-color: var(--ia-primary);
+      transform: translateY(-4px);
+      box-shadow: var(--glow-primary);
+    }
+
+    .api-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .api-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .api-name {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .api-description {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .api-endpoint {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--ia-accent);
+      background: var(--bg-secondary);
+      padding: 0.5rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .demo-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .demo-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      border-color: var(--ia-primary);
+    }
+
+    .demo-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, var(--bg-secondary), var(--bg-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .demo-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, transparent, rgba(0, 102, 255, 0.1));
+    }
+
+    .demo-content {
+      padding: 1.5rem;
+    }
+
+    .demo-title {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .demo-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+    }
+
+    .demo-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .demo-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .code-example {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .code-lang {
+      color: var(--ia-accent);
+      font-weight: 600;
+    }
+
+    .copy-btn {
+      padding: 0.5rem 1rem;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.8125rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--ia-primary);
+      color: var(--ia-primary);
+    }
+
+    .code-line {
+      margin-bottom: 0.5rem;
+    }
+
+    .code-comment { color: #6B7280; }
+    .code-keyword { color: #8B5CF6; }
+    .code-string { color: #00E5A0; }
+    .code-function { color: #0066FF; }
+    .code-variable { color: #F9FAFB; }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .stat-item {
+      background: var(--bg-elevated);
+      border-radius: 10px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .feature-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      display: flex;
+      gap: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .feature-item:hover {
+      background: var(--bg-hover);
+      border-color: var(--ia-primary);
+      transform: translateX(4px);
+    }
+
+    .feature-icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(0, 102, 255, 0.2), rgba(0, 102, 255, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .feature-text h4 {
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-text p {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <h1><span class="emoji">🖥️</span>Browser Rendering</h1>
+      <p>Run a full Chromium browser at the edge • Puppeteer & Playwright support</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="section">
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-value">28.4K</div>
+          <div class="stat-label">Renders This Month</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">1.2s</div>
+          <div class="stat-label">Avg Render Time</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">$89</div>
+          <div class="stat-label">Monthly Cost</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">90%</div>
+          <div class="stat-label">vs AWS Savings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <div class="section">
+      <h2 class="section-title">Available Endpoints</h2>
+      <div class="api-grid">
+        <div class="api-card">
+          <div class="api-icon">📸</div>
+          <div class="api-name">/screenshot</div>
+          <div class="api-description">Capture full-page or viewport screenshots in PNG, JPEG, or WebP</div>
+          <div class="api-endpoint">POST /screenshot</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">📄</div>
+          <div class="api-name">/pdf</div>
+          <div class="api-description">Render any webpage as a PDF with custom options</div>
+          <div class="api-endpoint">POST /pdf</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">🔍</div>
+          <div class="api-name">/scrape</div>
+          <div class="api-description">Extract structured data using CSS selectors</div>
+          <div class="api-endpoint">POST /scrape</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">🧠</div>
+          <div class="api-name">/json</div>
+          <div class="api-description">AI-powered data extraction to JSON schema</div>
+          <div class="api-endpoint">POST /json</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">📝</div>
+          <div class="api-name">/markdown</div>
+          <div class="api-description">Convert any webpage to clean Markdown</div>
+          <div class="api-endpoint">POST /markdown</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">🔗</div>
+          <div class="api-name">/links</div>
+          <div class="api-description">Extract all links from a webpage</div>
+          <div class="api-endpoint">POST /links</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">📦</div>
+          <div class="api-name">/content</div>
+          <div class="api-description">Fetch fully-rendered HTML after JS execution</div>
+          <div class="api-endpoint">POST /content</div>
+        </div>
+        <div class="api-card">
+          <div class="api-icon">📷</div>
+          <div class="api-name">/snapshot</div>
+          <div class="api-description">Take a complete webpage snapshot</div>
+          <div class="api-endpoint">POST /snapshot</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Use Cases -->
+    <div class="section">
+      <h2 class="section-title">Live Demo Examples</h2>
+      <div class="demo-grid">
+        <div class="demo-card">
+          <div class="demo-image">📊</div>
+          <div class="demo-content">
+            <div class="demo-title">Social Media Previews</div>
+            <div class="demo-description">Automatically generate Open Graph images for blog posts and pages</div>
+            <div class="demo-meta">
+              <span>⚡ 892ms avg</span>
+              <span>📸 12.4K/mo</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-image">🧾</div>
+          <div class="demo-content">
+            <div class="demo-title">Invoice Generation</div>
+            <div class="demo-description">Convert HTML invoices to PDF for email delivery</div>
+            <div class="demo-meta">
+              <span>⚡ 1.1s avg</span>
+              <span>📄 3.2K/mo</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-image">🔍</div>
+          <div class="demo-content">
+            <div class="demo-title">Competitive Intelligence</div>
+            <div class="demo-description">Monitor competitor pricing and product changes</div>
+            <div class="demo-meta">
+              <span>⚡ 2.3s avg</span>
+              <span>🔄 Daily cron</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-image">📰</div>
+          <div class="demo-content">
+            <div class="demo-title">Content Aggregation</div>
+            <div class="demo-description">Scrape articles and convert to markdown for your CMS</div>
+            <div class="demo-meta">
+              <span>⚡ 1.8s avg</span>
+              <span>📝 8.7K/mo</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-image">🧪</div>
+          <div class="demo-content">
+            <div class="demo-title">E2E Testing</div>
+            <div class="demo-description">Automated Playwright tests on every deployment</div>
+            <div class="demo-meta">
+              <span>⚡ 3.4s avg</span>
+              <span>🧪 450/mo</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-image">📈</div>
+          <div class="demo-content">
+            <div class="demo-title">SEO Monitoring</div>
+            <div class="demo-description">Track page load times and visual changes</div>
+            <div class="demo-meta">
+              <span>⚡ 1.4s avg</span>
+              <span>⏰ Hourly</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="section">
+      <h2 class="section-title">Key Features</h2>
+      <div class="feature-grid">
+        <div class="feature-item">
+          <div class="feature-icon-box">🚀</div>
+          <div class="feature-text">
+            <h4>Edge-Native</h4>
+            <p>Runs on Cloudflare's global network for low latency</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-box">🎭</div>
+          <div class="feature-text">
+            <h4>Full Browser</h4>
+            <p>Complete Chromium with JS rendering, cookies, and more</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-box">🤖</div>
+          <div class="feature-text">
+            <h4>Puppeteer Compatible</h4>
+            <p>Use familiar Puppeteer API in Workers</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-box">💰</div>
+          <div class="feature-text">
+            <h4>Pay-Per-Use</h4>
+            <p>$5 per million renders • No server costs</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-box">⚡</div>
+          <div class="feature-text">
+            <h4>Queue Integration</h4>
+            <p>Process renders asynchronously at scale</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-box">🔧</div>
+          <div class="feature-text">
+            <h4>Custom Options</h4>
+            <p>Viewport size, wait conditions, user agents</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Code Examples -->
+    <div class="section">
+      <h2 class="section-title">Quick Start Examples</h2>
+      
+      <div class="code-example">
+        <div class="code-header">
+          <span class="code-lang">JavaScript - REST API</span>
+          <button class="copy-btn">Copy Code</button>
+        </div>
+        <div class="code-line"><span class="code-comment">// Take a screenshot via REST API</span></div>
+        <div class="code-line"><span class="code-keyword">const</span> <span class="code-variable">response</span> = <span class="code-keyword">await</span> <span class="code-function">fetch</span>(<span class="code-string">'https://api.cloudflare.com/browser/screenshot'</span>, {</div>
+        <div class="code-line">  <span class="code-variable">method</span>: <span class="code-string">'POST'</span>,</div>
+        <div class="code-line">  <span class="code-variable">headers</span>: { <span class="code-string">'Authorization'</span>: <span class="code-string">'Bearer YOUR_TOKEN'</span> },</div>
+        <div class="code-line">  <span class="code-variable">body</span>: <span class="code-function">JSON.stringify</span>({</div>
+        <div class="code-line">    <span class="code-variable">url</span>: <span class="code-string">'https://example.com'</span>,</div>
+        <div class="code-line">    <span class="code-variable">options</span>: { <span class="code-variable">fullPage</span>: <span class="code-keyword">true</span>, <span class="code-variable">type</span>: <span class="code-string">'png'</span> }</div>
+        <div class="code-line">  })</div>
+        <div class="code-line">});</div>
+        <div class="code-line"></div>
+        <div class="code-line"><span class="code-keyword">const</span> <span class="code-variable">screenshot</span> = <span class="code-keyword">await</span> <span class="code-variable">response</span>.<span class="code-function">arrayBuffer</span>();</div>
+      </div>
+
+      <div class="code-example">
+        <div class="code-header">
+          <span class="code-lang">TypeScript - Puppeteer in Worker</span>
+          <button class="copy-btn">Copy Code</button>
+        </div>
+        <div class="code-line"><span class="code-comment">// Use Puppeteer directly in a Worker</span></div>
+        <div class="code-line"><span class="code-keyword">import</span> puppeteer <span class="code-keyword">from</span> <span class="code-string">'@cloudflare/puppeteer'</span>;</div>
+        <div class="code-line"></div>
+        <div class="code-line"><span class="code-keyword">export</span> <span class="code-keyword">default</span> {</div>
+        <div class="code-line">  <span class="code-keyword">async</span> <span class="code-function">fetch</span>(<span class="code-variable">request</span>, <span class="code-variable">env</span>) {</div>
+        <div class="code-line">    <span class="code-keyword">const</span> <span class="code-variable">browser</span> = <span class="code-keyword">await</span> puppeteer.<span class="code-function">launch</span>(<span class="code-variable">env</span>.<span class="code-variable">BROWSER</span>);</div>
+        <div class="code-line">    <span class="code-keyword">const</span> <span class="code-variable">page</span> = <span class="code-keyword">await</span> <span class="code-variable">browser</span>.<span class="code-function">newPage</span>();</div>
+        <div class="code-line">    </div>
+        <div class="code-line">    <span class="code-keyword">await</span> <span class="code-variable">page</span>.<span class="code-function">goto</span>(<span class="code-string">'https://example.com'</span>);</div>
+        <div class="code-line">    <span class="code-keyword">const</span> <span class="code-variable">screenshot</span> = <span class="code-keyword">await</span> <span class="code-variable">page</span>.<span class="code-function">screenshot</span>();</div>
+        <div class="code-line">    </div>
+        <div class="code-line">    <span class="code-keyword">await</span> <span class="code-variable">browser</span>.<span class="code-function">close</span>();</div>
+        <div class="code-line">    <span class="code-keyword">return</span> <span class="code-keyword">new</span> <span class="code-function">Response</span>(<span class="code-variable">screenshot</span>, {</div>
+        <div class="code-line">      <span class="code-variable">headers</span>: { <span class="code-string">'Content-Type'</span>: <span class="code-string">'image/png'</span> }</div>
+        <div class="code-line">    });</div>
+        <div class="code-line">  }</div>
+        <div class="code-line">};</div>
+      </div>
+
+      <div class="code-example">
+        <div class="code-header">
+          <span class="code-lang">JavaScript - With Queues for Scale</span>
+          <button class="copy-btn">Copy Code</button>
+        </div>
+        <div class="code-line"><span class="code-comment">// Queue 1000s of screenshots for batch processing</span></div>
+        <div class="code-line"><span class="code-keyword">for</span> (<span class="code-keyword">const</span> <span class="code-variable">url</span> <span class="code-keyword">of</span> <span class="code-variable">urls</span>) {</div>
+        <div class="code-line">  <span class="code-keyword">await</span> <span class="code-variable">env</span>.<span class="code-variable">SCREENSHOT_QUEUE</span>.<span class="code-function">send</span>({ <span class="code-variable">url</span>, <span class="code-variable">userId</span> });</div>
+        <div class="code-line">}</div>
+        <div class="code-line"></div>
+        <div class="code-line"><span class="code-comment">// Consumer processes in parallel</span></div>
+        <div class="code-line"><span class="code-keyword">export</span> <span class="code-keyword">default</span> {</div>
+        <div class="code-line">  <span class="code-keyword">async</span> <span class="code-function">queue</span>(<span class="code-variable">batch</span>, <span class="code-variable">env</span>) {</div>
+        <div class="code-line">    <span class="code-keyword">const</span> <span class="code-variable">browser</span> = <span class="code-keyword">await</span> puppeteer.<span class="code-function">launch</span>(<span class="code-variable">env</span>.<span class="code-variable">BROWSER</span>);</div>
+        <div class="code-line">    </div>
+        <div class="code-line">    <span class="code-keyword">for</span> (<span class="code-keyword">const</span> <span class="code-variable">message</span> <span class="code-keyword">of</span> <span class="code-variable">batch</span>.<span class="code-variable">messages</span>) {</div>
+        <div class="code-line">      <span class="code-keyword">const</span> <span class="code-variable">page</span> = <span class="code-keyword">await</span> <span class="code-variable">browser</span>.<span class="code-function">newPage</span>();</div>
+        <div class="code-line">      <span class="code-keyword">await</span> <span class="code-variable">page</span>.<span class="code-function">goto</span>(<span class="code-variable">message</span>.<span class="code-variable">body</span>.<span class="code-variable">url</span>);</div>
+        <div class="code-line">      <span class="code-keyword">const</span> <span class="code-variable">screenshot</span> = <span class="code-keyword">await</span> <span class="code-variable">page</span>.<span class="code-function">screenshot</span>();</div>
+        <div class="code-line">      </div>
+        <div class="code-line">      <span class="code-comment">// Upload to R2</span></div>
+        <div class="code-line">      <span class="code-keyword">await</span> <span class="code-variable">env</span>.<span class="code-variable">R2</span>.<span class="code-function">put</span>(<span class="code-string">`screenshots/${message.body.userId}.png`</span>, <span class="code-variable">screenshot</span>);</div>
+        <div class="code-line">    }</div>
+        <div class="code-line">    </div>
+        <div class="code-line">    <span class="code-keyword">await</span> <span class="code-variable">browser</span>.<span class="code-function">close</span>();</div>
+        <div class="code-line">  }</div>
+        <div class="code-line">};</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
