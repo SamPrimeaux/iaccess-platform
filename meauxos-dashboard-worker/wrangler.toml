@@ -1,16 +1,107 @@
-# MeauxOS Dashboard Worker
+# MeauxOS Dashboard Worker - Full SaaS Configuration
 name = "meauxos-dashboard"
 main = "src/index.ts"
 compatibility_date = "2024-12-20"
+account_id = "ede6590ac0d2fb7daf155b35653457b2"
 
 # Static assets - serve from local directory
 assets = { directory = "./public", binding = "ASSETS" }
 
-# D1 Bindings for live data
+# ═══════════════════════════════════════════════════════════════
+# R2 BUCKET BINDINGS
+# ═══════════════════════════════════════════════════════════════
+
+[[r2_buckets]]
+binding = "R2_INFRASTRUCTURE"
+bucket_name = "allinfrastructure"
+
+[[r2_buckets]]
+binding = "R2_IMAGES"
+bucket_name = "entireorganizationimagesandcontentbucket"
+
+[[r2_buckets]]
+binding = "R2_APPS"
+bucket_name = "entirebrandedhtmlwebapps"
+
+# ═══════════════════════════════════════════════════════════════
+# D1 DATABASE BINDINGS (All 20 databases)
+# ═══════════════════════════════════════════════════════════════
+
 [[d1_databases]]
 binding = "DB"
 database_name = "meauxos"
 database_id = "d8261777-9384-44f7-924d-c92247d55b46"
 
+[[d1_databases]]
+binding = "DASHBOARD_DB"
+database_name = "meauxbility-dashboard-db"
+database_id = "613e4fe1-94f3-4aa1-8dfc-7f321d3bc46f"
+
+[[d1_databases]]
+binding = "SAAS_DB"
+database_name = "hybridprosaas-db"
+database_id = "791e2df7-d5e7-49fe-a222-c122933265ae"
+
+[[d1_databases]]
+binding = "MEAUXSTACK_DB"
+database_name = "meauxstack-saas-db"
+database_id = "ee3e3adb-da99-457d-8c2c-390ff19f6435"
+
+[[d1_databases]]
+binding = "MEAUXWORK_DB"
+database_name = "meauxwork-db"
+database_id = "7a8dbae8-9c9c-4872-8824-9dc6fbc62fb2"
+
+[[d1_databases]]
+binding = "MEAUX_WORK_DB"
+database_name = "meaux-work-db"
+database_id = "2a3a763a-92f1-4633-849e-268ddb31998f"
+
+[[d1_databases]]
+binding = "MEAUXPHOTO_DB"
+database_name = "meauxphoto-db"
+database_id = "f1968266-1017-43f8-8572-caf2b0d63c4c"
+
+[[d1_databases]]
+binding = "MEAUXACCESS_DB"
+database_name = "meauxaccess-db"
+database_id = "1aaf9981-30f9-49f7-833f-462b523e4abb"
+
+[[d1_databases]]
+binding = "MEAUXBILITYORG_DB"
+database_name = "meauxbilityorg"
+database_id = "011d1629-b5c8-49e7-8f6d-ca311ba936fe"
+
+[[d1_databases]]
+binding = "MEAUXMARKETS_DB"
+database_name = "meauxmarkets_dev"
+database_id = "df192326-00b4-4d68-ad0d-5dd439dc8898"
+
+[[d1_databases]]
+binding = "INNERANIMAL_DB"
+database_name = "inneranimalmedia"
+database_id = "7a4ba110-b50f-46f8-9e1c-e61e9a5995ac"
+
+[[d1_databases]]
+binding = "INNERANIMAL_ASSETS_DB"
+database_name = "inneranimalmedia-assets"
+database_id = "e0ec00b8-4e3c-422e-abba-70b7548c1f87"
+
+[[d1_databases]]
+binding = "INNERANIMAL_LIBRARY_DB"
+database_name = "inneranimalmedia_app_library"
+database_id = "ff10ed0d-fb18-4f94-8e8a-2d8eb2053bef"
+
+[[d1_databases]]
+binding = "SOUTHERNPETS_DB"
+database_name = "southernpetsanimalrescue"
+database_id = "f01e1fbb-01fb-4900-80e9-bbb90db51bbe"
+
+# ═══════════════════════════════════════════════════════════════
+# ENVIRONMENT VARIABLES
+# ═══════════════════════════════════════════════════════════════
+
 [vars]
 ENVIRONMENT = "production"
+API_VERSION = "2.0"
+DASHBOARD_NAME = "MeauxOS"

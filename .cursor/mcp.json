@@ -7,7 +7,7 @@
       "command": "npx",
       "args": ["-y", "@cloudflare/mcp-server-cloudflare"],
       "env": {
-        "CLOUDFLARE_API_TOKEN": "meHW2uHn0LohFAEO6nMPWlfJ8L46cUwPOJuJRPB1",
+        "CLOUDFLARE_API_TOKEN": "LVhc1jRcYTEPZA8hxngPLJLN4n2npEX-Jyjh_2sP",
         "CLOUDFLARE_ACCOUNT_ID": "ede6590ac0d2fb7daf155b35653457b2"
       }
     },
