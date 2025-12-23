@@ -1,7 +1,14 @@
 {
   "mcpServers": {
     "supabase": {
-      "url": "https://mcp.supabase.com/mcp?project_ref=qmpghmthbhuumemnahcz"
+      "httpUrl": "https://mcp.supabase.com/mcp?project_ref=qmpghmthbhuumemnahcz"
+    },
+    "gemini": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-gemini"],
+      "env": {
+        "GEMINI_API_KEY": "${GEMINI_API_KEY}"
+      }
     }
   }
 }
