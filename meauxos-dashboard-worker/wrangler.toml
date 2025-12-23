@@ -1,0 +1,16 @@
+# MeauxOS Dashboard Worker
+name = "meauxos-dashboard"
+main = "src/index.ts"
+compatibility_date = "2024-12-20"
+
+# Static assets - serve from local directory
+assets = { directory = "./public", binding = "ASSETS" }
+
+# D1 Bindings for live data
+[[d1_databases]]
+binding = "DB"
+database_name = "meauxos"
+database_id = "d8261777-9384-44f7-924d-c92247d55b46"
+
+[vars]
+ENVIRONMENT = "production"
