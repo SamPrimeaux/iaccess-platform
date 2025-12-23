@@ -172,7 +172,7 @@ CREATE TABLE api_integrations (
   service_name TEXT NOT NULL UNIQUE, -- 'google', 'openai', 'github', 'cloudconvert'
   api_key_encrypted TEXT, -- Encrypted API key
   config_json TEXT, -- JSONB config for the service
-  enabled BOOLEAN DEFAULT 1,
+  enabled BOOLEAN DEFAULT TRUE,
   last_used INTEGER,
   created_at INTEGER DEFAULT (EXTRACT(EPOCH FROM NOW())::BIGINT),
   updated_at INTEGER DEFAULT (EXTRACT(EPOCH FROM NOW())::BIGINT)
@@ -253,8 +253,8 @@ CREATE TABLE apps (
   review_count INTEGER DEFAULT 0,
   
   -- Access
-  is_public BOOLEAN DEFAULT 1,
-  is_featured BOOLEAN DEFAULT 0,
+  is_public BOOLEAN DEFAULT TRUE,
+  is_featured BOOLEAN DEFAULT FALSE,
   install_url TEXT NOT NULL,
   documentation_url TEXT,
   
@@ -296,10 +296,10 @@ CREATE TABLE backup_jobs (
     source_path TEXT,
     destination_bucket TEXT NOT NULL,
     destination_path TEXT,
-    include_node_modules BOOLEAN DEFAULT 0,
-    include_env_files BOOLEAN DEFAULT 0,
-    compress BOOLEAN DEFAULT 1,
-    encryption_enabled BOOLEAN DEFAULT 0,
+    include_node_modules BOOLEAN DEFAULT FALSE,
+    include_env_files BOOLEAN DEFAULT FALSE,
+    compress BOOLEAN DEFAULT TRUE,
+    encryption_enabled BOOLEAN DEFAULT FALSE,
     total_files INTEGER DEFAULT 0,
     files_processed INTEGER DEFAULT 0,
     bytes_total INTEGER DEFAULT 0,
@@ -525,7 +525,7 @@ CREATE TABLE content_metadata (
 
 -- Table: conversation_history
 CREATE TABLE conversation_history (
-  id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
   source TEXT NOT NULL, -- 'claude', 'chatgpt', 'other'
   external_id TEXT, -- ID from external service
   title TEXT NOT NULL,
@@ -539,15 +539,14 @@ CREATE TABLE conversation_history (
 
 -- Table: conversation_messages
 CREATE TABLE conversation_messages (
-  id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
   conversation_id TEXT NOT NULL,
   role TEXT NOT NULL, -- 'user', 'assistant', 'system'
   content TEXT NOT NULL,
   model TEXT, -- Model used (e.g., 'gpt-4', 'claude-3-opus')
   tokens INTEGER,
   created_at TEXT DEFAULT NOW(),
-  metadata TEXT, -- JSONB string for additional data
-  FOREIGN KEY (conversation_id) REFERENCES conversation_history(id) ON DELETE CASCADE
+  metadata TEXT -- JSONB string for additional data
 );
 
 -- Table: cost_attribution
@@ -582,8 +581,7 @@ CREATE TABLE cross_device_sync (
     sync_key TEXT NOT NULL, -- 'dashboard_state', 'current_project', etc.
     sync_data TEXT NOT NULL, -- JSONB data
     updated_at INTEGER DEFAULT (EXTRACT(EPOCH FROM NOW())::BIGINT),
-    updated_by_device TEXT, -- device_id that made the update
-    FOREIGN KEY (user_id) REFERENCES team_members(id)
+    updated_by_device TEXT -- device_id that made the update
 );
 
 -- Table: custom_agents
@@ -804,7 +802,7 @@ CREATE TABLE email_messages (
     subject TEXT,
     body TEXT,
     received_at TEXT DEFAULT NOW(),
-    read BOOLEAN DEFAULT 0
+    read BOOLEAN DEFAULT FALSE
 );
 
 -- Table: employee_storage
@@ -830,12 +828,12 @@ CREATE TABLE env_variables (
     environment TEXT NOT NULL,
     key TEXT NOT NULL,
     value TEXT NOT NULL,
-    encrypted BOOLEAN DEFAULT 1,
+    encrypted BOOLEAN DEFAULT TRUE,
     description TEXT,
-    is_secret BOOLEAN DEFAULT 1,
-    required BOOLEAN DEFAULT 0,
+    is_secret BOOLEAN DEFAULT TRUE,
+    required BOOLEAN DEFAULT FALSE,
     default_value TEXT,
-    synced_to_platform BOOLEAN DEFAULT 0,
+    synced_to_platform BOOLEAN DEFAULT FALSE,
     last_synced_at TEXT,
     created_by TEXT,
     updated_by TEXT,
@@ -1042,7 +1040,7 @@ CREATE TABLE iautodidact_code_examples (
     description TEXT,
     use_case TEXT,
     api_type TEXT, -- 'openai', 'cloudflare', 'gemini', 'google_cloud'
-    testable BOOLEAN DEFAULT 0, -- Can be run/tested
+    testable BOOLEAN DEFAULT FALSE, -- Can be run/tested
     test_code TEXT, -- Test cases or validation
     embedding_json TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -1465,7 +1463,7 @@ CREATE TABLE openai_spending_alerts (
     budget_amount DOUBLE PRECISION,
     message TEXT,
     sent_at TIMESTAMPTZ,
-    email_sent BOOLEAN DEFAULT 0,
+    email_sent BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -1511,7 +1509,7 @@ CREATE TABLE org_settings (
 
 -- Table: payouts
 CREATE TABLE payouts (
-    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
     employee_id TEXT,
     volunteer_id TEXT,
     amount DOUBLE PRECISION NOT NULL,
@@ -1546,7 +1544,7 @@ CREATE TABLE progress (   id TEXT PRIMARY KEY,   userId TEXT NOT NULL,   lessonI
 
 -- Table: project_activity
 CREATE TABLE project_activity (
-          id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+          id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
           project_id TEXT,
           team_member_id TEXT,
           action_type TEXT NOT NULL,
@@ -1557,7 +1555,7 @@ CREATE TABLE project_activity (
 
 -- Table: project_assignments
 CREATE TABLE project_assignments (
-          id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+          id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
           project_id TEXT NOT NULL,
           team_member_id TEXT NOT NULL,
           role TEXT DEFAULT 'contributor',
@@ -1595,7 +1593,7 @@ CREATE TABLE project_cost_summary (
 
 -- Table: project_deadlines
 CREATE TABLE project_deadlines (
-    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
     project_id TEXT NOT NULL,
     deadline_date TEXT NOT NULL,
     deadline_type TEXT DEFAULT 'milestone' CHECK (deadline_type IN ('milestone', 'delivery', 'review', 'launch', 'other')),
@@ -1611,7 +1609,7 @@ CREATE TABLE project_deadlines (
 
 -- Table: project_milestones
 CREATE TABLE project_milestones (
-          id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+          id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
           project_id TEXT NOT NULL,
           name TEXT NOT NULL,
           description TEXT,
@@ -1675,7 +1673,7 @@ CREATE TABLE project_stats (
 
 -- Table: project_tasks
 CREATE TABLE project_tasks (
-          id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+          id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
           project_id TEXT NOT NULL,
           milestone_id TEXT,
           assigned_to TEXT,
@@ -1739,7 +1737,7 @@ CREATE TABLE rag_queries (
   sources TEXT,
   model_used TEXT,
   latency_ms INTEGER,
-  cache_hit BOOLEAN DEFAULT 0,
+  cache_hit BOOLEAN DEFAULT FALSE,
   created_at INTEGER DEFAULT (EXTRACT(EPOCH FROM NOW())::BIGINT)
 );
 
@@ -1772,7 +1770,7 @@ CREATE TABLE scene_configs (
 
 -- Table: scheduled_streams
 CREATE TABLE scheduled_streams (
-    id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+    id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
     stream_id TEXT,
     title TEXT NOT NULL,
     description TEXT,
@@ -1786,7 +1784,7 @@ CREATE TABLE scheduled_streams (
     status TEXT DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'live', 'completed', 'cancelled')),
     recording_url TEXT,
     meeting_notes_id TEXT,
-    email_sent BOOLEAN DEFAULT 0,
+    email_sent BOOLEAN DEFAULT FALSE,
     email_sent_at TEXT,
     created_at INTEGER DEFAULT (EXTRACT(EPOCH FROM NOW())::BIGINT),
     updated_at INTEGER DEFAULT (EXTRACT(EPOCH FROM NOW())::BIGINT)
@@ -1895,7 +1893,7 @@ CREATE TABLE storage_usage (
     backups_size_bytes INTEGER DEFAULT 0,
     other_size_bytes INTEGER DEFAULT 0,
     limit_bytes INTEGER,
-    limit_reached BOOLEAN DEFAULT 0,
+    limit_reached BOOLEAN DEFAULT FALSE,
     cost_usd DOUBLE PRECISION DEFAULT 0,
     measured_at TEXT DEFAULT NOW(),
     created_at TEXT DEFAULT NOW()
@@ -2024,7 +2022,7 @@ CREATE TABLE team_workflows (
     quality_score INTEGER,
     last_used TIMESTAMPTZ,
     use_count INTEGER DEFAULT 0,
-    prevents_redundancy BOOLEAN DEFAULT 1, -- Does this prevent redundant work?
+    prevents_redundancy BOOLEAN DEFAULT TRUE, -- Does this prevent redundant work?
     embedding_json TEXT,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -2054,14 +2052,14 @@ CREATE TABLE time_entries (
 
 -- Table: time_logs
 CREATE TABLE time_logs (
-          id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+          id TEXT PRIMARY KEY DEFAULT (gen_random_uuid()::text),
           team_member_id TEXT NOT NULL,
           project_id TEXT,
           task_description TEXT NOT NULL,
           start_time TEXT NOT NULL,
           end_time TEXT,
           duration_minutes INTEGER,
-          billable BOOLEAN DEFAULT 0,
+          billable BOOLEAN DEFAULT FALSE,
           category TEXT,
           notes TEXT,
           created_at TEXT DEFAULT NOW(),
@@ -2129,8 +2127,7 @@ CREATE TABLE user_preferences (
   theme TEXT DEFAULT 'light', -- 'light', 'dark', 'auto'
   notifications INTEGER DEFAULT 1,
   emailNotifications INTEGER DEFAULT 1,
-  preferences TEXT, -- JSONB for additional preferences
-  FOREIGN KEY (userId) REFERENCES users(id) ON DELETE CASCADE
+  preferences TEXT -- JSONB for additional preferences
 );
 
 -- Table: users
@@ -2305,7 +2302,7 @@ CREATE TABLE workstations (
     platform TEXT NOT NULL,
     location TEXT,
     last_synced_at TEXT,
-    sync_enabled BOOLEAN DEFAULT 1,
+    sync_enabled BOOLEAN DEFAULT TRUE,
     sync_frequency TEXT DEFAULT 'hourly',
     projects_tracked TEXT,
     local_storage_path TEXT,
