@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MeauxStack • Internal Workforce OS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050814;
+      --bg-soft: #080E1F;
+      --bg-card: rgba(15, 25, 48, 0.85);
+      --bg-pill: rgba(19, 32, 64, 0.95);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-strong: rgba(255, 255, 255, 0.11);
+      --meaux-mint: #29F2C8;
+      --meaux-teal: #2FB3C9;
+      --meaux-orange: #FF6B35;
+      --meaux-amber: #FFB347;
+      --text-main: #F5F7FF;
+      --text-soft: #A5B1D8;
+      --text-muted: #6E7AA8;
+      --danger: #FF4F6A;
+      --success: #10B981;
+      --shadow-soft: 0 24px 80px rgba(0, 0, 0, 0.8);
+      --radius-lg: 24px;
+      --radius-pill: 999px;
+      --blur-glass: 22px;
+      --nav-h: 70px;
+      --transition-fast: 160ms ease-out;
+      --transition-smooth: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top left, #17213f 0, #050814 44%, #010109 100%);
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: -20%;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(41, 242, 200, 0.18), transparent 45%),
+        radial-gradient(circle at 80% 10%, rgba(47, 179, 201, 0.18), transparent 52%),
+        radial-gradient(circle at 50% 110%, rgba(255, 107, 53, 0.2), transparent 52%);
+      opacity: 0.8;
+      mix-blend-mode: screen;
+      pointer-events: none;
+      z-index: -2;
+      animation: ambient-drift 20s ease-in-out infinite alternate;
+    }
+
+    @keyframes ambient-drift {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(2%, -2%) scale(1.02); }
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 16px 48px;
+    }
+
+    @media (min-width: 960px) {
+      .page {
+        padding: 28px 32px 64px;
+      }
+    }
+
+    /* NAV */
+    .nav {
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+
+    .brand:hover {
+      transform: scale(0.98);
+    }
+
+    .brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 22px;
+      background: radial-gradient(circle at 20% 0%, var(--meaux-mint), transparent 55%),
+                  radial-gradient(circle at 80% 100%, var(--meaux-orange), transparent 45%),
+                  radial-gradient(circle at 50% 50%, #06101F, #02040B);
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 18px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .brand-mark::before {
+      content: "";
+      position: absolute;
+      inset: 18%;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      left: 23%;
+      right: 23%;
+      top: 26%;
+      bottom: 26%;
+      border-radius: 16px;
+      background:
+        linear-gradient(145deg, rgba(5, 11, 24, 0.3), rgba(0, 0, 0, 0.75));
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12),
+        0 10px 22px rgba(0, 0, 0, 0.9);
+      transform: perspective(90px) rotateX(16deg);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .brand-line {
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .brand-name {
+      font-weight: 800;
+      font-size: 22px;
+      letter-spacing: 0.01em;
+      line-height: 1;
+    }
+
+    .brand-name span.meaux {
+      color: var(--meaux-mint);
+    }
+
+    .brand-name span.stack {
+      color: #FFFFFF;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .nav-pill {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-soft);
+      background: radial-gradient(circle at 0 0, rgba(41, 242, 200, 0.16), rgba(6, 14, 31, 0.96));
+      backdrop-filter: blur(14px);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 10%, #8CFFD9, #18B68A);
+      box-shadow: 0 0 14px rgba(41, 242, 200, 0.9);
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    .nav-ghost {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-soft);
+      background: rgba(5, 9, 20, 0.9);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-ghost:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(10, 18, 40, 0.95);
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    /* MAIN LAYOUT */
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.3fr);
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* HERO PANEL */
+    .hero {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 0 0, rgba(41, 242, 200, 0.08), transparent 55%),
+                  radial-gradient(circle at 80% 0, rgba(255, 107, 53, 0.11), transparent 60%),
+                  linear-gradient(135deg, rgba(7, 12, 25, 0.96), rgba(6, 12, 28, 0.96));
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      padding: 28px 24px 24px;
+      backdrop-filter: blur(var(--blur-glass));
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+    }
+
+    .hero:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 32px 96px rgba(0, 0, 0, 0.9);
+    }
+
+    @media (min-width: 960px) {
+      .hero {
+        padding: 32px 28px 28px;
+      }
+    }
+
+    .hero-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: var(--radius-pill);
+      background: rgba(5, 9, 20, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .hero-badge span.label {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-weight: 700;
+      color: var(--meaux-teal);
+      font-size: 11px;
+    }
+
+    .hero-badge span.divider {
+      width: 1px;
+      height: 16px;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .hero-kpi-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: radial-gradient(circle at 0 0, rgba(41, 242, 200, 0.12), rgba(7, 11, 22, 0.93));
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .hero-kpi-chip strong {
+      color: var(--meaux-mint);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .hero-title {
+      font-size: clamp(28px, 3.4vw, 38px);
+      line-height: 1.12;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .hero-title span.highlight {
+      background: linear-gradient(120deg, var(--meaux-mint), var(--meaux-teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--text-soft);
+      max-width: 560px;
+      margin-bottom: 24px;
+    }
+
+    .hero-subtitle strong {
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .btn {
+      border-radius: var(--radius-pill);
+      border: none;
+      padding: 12px 24px;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--meaux-mint), var(--meaux-teal));
+      color: #02040B;
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.9),
+        0 0 0 1px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 18px 48px rgba(0, 0, 0, 1),
+        0 0 40px rgba(41, 242, 200, 0.4);
+    }
+
+    .btn-ghost {
+      background: rgba(5, 9, 20, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-soft);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(12, 22, 42, 0.98);
+      border-color: rgba(255, 255, 255, 0.32);
+      color: #FFFFFF;
+      transform: translateY(-2px);
+    }
+
+    .btn-pill-sub {
+      border-radius: var(--radius-pill);
+      border: 1px dashed rgba(255, 255, 255, 0.18);
+      padding: 8px 16px;
+      font-size: 12px;
+      color: var(--text-muted);
+      background: rgba(5, 9, 20, 0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .btn-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--meaux-mint);
+      box-shadow: 0 0 10px rgba(41, 242, 200, 0.8);
+    }
+
+    /* HERO METRICS PANEL */
+    .hero-metrics {
+      margin-top: 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 720px) {
+      .hero-metrics {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .metric-card {
+      border-radius: 20px;
+      background: radial-gradient(circle at 0 0, rgba(47, 179, 201, 0.12), rgba(6, 12, 28, 0.96));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.16);
+    }
+
+    .metric-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 120% -10%, rgba(255, 255, 255, 0.12), transparent 58%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .metric-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+
+    .metric-label-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      background: rgba(3, 8, 20, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--meaux-mint);
+    }
+
+    .metric-value {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: 24px;
+      color: #FFFFFF;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(4, 24, 24, 0.8);
+      color: #B6FFE7;
+      border: 1px solid rgba(41, 242, 200, 0.45);
+    }
+
+    .metric-trend span.arrow {
+      display: inline-block;
+      font-size: 10px;
+    }
+
+    .metric-meter {
+      margin-top: 12px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(4, 7, 18, 0.9);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .metric-meter-fill {
+      position: absolute;
+      inset: 0;
+      width: 76%;
+      max-width: 100%;
+      background: linear-gradient(90deg, var(--meaux-mint), var(--meaux-orange));
+      border-radius: 999px;
+      box-shadow: 0 0 18px rgba(41, 242, 200, 0.7);
+    }
+
+    .metric-meter-fill.alt {
+      width: 61%;
+      background: linear-gradient(90deg, var(--meaux-orange), var(--danger));
+      box-shadow: 0 0 18px rgba(255, 107, 53, 0.7);
+    }
+
+    .metric-footer {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.5;
+    }
+
+    .metric-footer span {
+      color: #FFFFFF;
+      font-weight: 600;
+    }
+
+    /* RIGHT COLUMN */
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* STACK MAP */
+    .stack-map {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(160deg, rgba(6, 10, 24, 0.96), rgba(5, 8, 18, 0.96));
+      border: 1px solid var(--border-subtle);
+      padding: 20px 18px 18px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(var(--blur-glass));
+      transition: transform var(--transition-smooth);
+    }
+
+    .stack-map:hover {
+      transform: translateY(-2px);
+    }
+
+    .stack-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+      align-items: center;
+    }
+
+    .stack-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .stack-tag {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--meaux-teal);
+      background: rgba(3, 8, 19, 0.9);
+      letter-spacing: 0.02em;
+    }
+
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .stack-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .stack-block {
+      border-radius: 18px;
+      background: radial-gradient(circle at 0 0, rgba(47, 179, 201, 0.2), transparent 60%),
+                  radial-gradient(circle at 120% 0, rgba(255, 107, 53, 0.25), transparent 55%),
+                  rgba(6, 11, 26, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 14px 12px 12px;
+      position: relative;
+      overflow: hidden;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .stack-block:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+    }
+
+    .stack-block-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .stack-block-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+    }
+
+    .stack-glyph {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: radial-gradient(circle at 30% 0, rgba(188, 255, 235, 0.85), rgba(29, 109, 97, 0.75));
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .stack-glyph::before {
+      content: "";
+      position: absolute;
+      inset: 24%;
+      border-radius: 10px;
+      border: 1px solid rgba(3, 24, 18, 0.7);
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
+    }
+
+    .stack-block-body {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    .stack-tags {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .stack-pill {
+      border-radius: 999px;
+      background: rgba(5, 11, 25, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* ONBOARDING */
+    .onboarding {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 0 0, rgba(41, 242, 200, 0.18), transparent 60%),
+                  radial-gradient(circle at 100% 0, rgba(255, 107, 53, 0.16), transparent 60%),
+                  linear-gradient(145deg, rgba(6, 10, 24, 0.96), rgba(4, 7, 16, 0.98));
+      border: 1px solid var(--border-strong);
+      padding: 20px 18px 18px;
+      transition: transform var(--transition-smooth);
+    }
+
+    .onboarding:hover {
+      transform: translateY(-2px);
+    }
+
+    .onboarding-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .onboarding-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .onboarding-badge {
+      border-radius: var(--radius-pill);
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(3, 18, 13, 0.9);
+      color: var(--meaux-mint);
+      letter-spacing: 0.02em;
+    }
+
+    .onboarding-steps {
+      margin-top: 8px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 960px) {
+      .onboarding-steps {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .step-card {
+      border-radius: 18px;
+      background: rgba(8, 14, 30, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      padding: 14px 14px 12px;
+      position: relative;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .step-card:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.8);
+    }
+
+    .step-card::before {
+      content: attr(data-step);
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: rgba(165, 177, 216, 0.5);
+    }
+
+    .step-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .step-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+      letter-spacing: -0.01em;
+    }
+
+    .step-body {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.6;
+    }
+
+    /* LOWER GRID */
+    .lower-grid {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: minmax(0, 2.2fr) minmax(0, 2fr);
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      .lower-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .module-panel {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 0 0, rgba(47, 179, 201, 0.12), transparent 50%),
+                  linear-gradient(150deg, rgba(7, 12, 25, 0.98), rgba(6, 10, 22, 0.98));
+      border: 1px solid var(--border-subtle);
+      padding: 20px 18px 16px;
+      box-shadow: var(--shadow-soft);
+      transition: transform var(--transition-smooth);
+    }
+
+    .module-panel:hover {
+      transform: translateY(-2px);
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+    }
+
+    .panel-sub {
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .module-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    @media (max-width: 720px) {
+      .module-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .module-card {
+      border-radius: 16px;
+      background: rgba(6, 11, 26, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 14px 12px 12px;
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .module-card:hover {
+      border-color: rgba(255, 255, 255, 0.34);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(0, 0, 0, 0.9);
+    }
+
+    .module-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #FFFFFF;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .module-desc {
+      font-size: 12px;
+      color: var(--text-soft);
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .module-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-wrap: wrap;
+    }
+
+    .module-chip {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(5, 11, 25, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    .status-pill {
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .status-pill.active {
+      background: rgba(41, 242, 200, 0.12);
+      color: #B6FFE7;
+      border: 1px solid rgba(41, 242, 200, 0.5);
+    }
+
+    .status-pill.dev {
+      background: rgba(255, 179, 71, 0.12);
+      border: 1px solid rgba(255, 179, 71, 0.6);
+      color: #FFE1A5;
+    }
+
+    .status-pill.idea {
+      background: rgba(110, 122, 168, 0.12);
+      border: 1px solid rgba(110, 122, 168, 0.6);
+      color: #D2D9F5;
+    }
+
+    .panel-secondary {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at 0 0, rgba(255, 107, 53, 0.16), transparent 55%),
+                  linear-gradient(140deg, rgba(5, 9, 20, 0.98), rgba(3, 5, 11, 0.98));
+      border: 1px solid var(--border-subtle);
+      padding: 20px 18px 16px;
+      transition: transform var(--transition-smooth);
+    }
+
+    .panel-secondary:hover {
+      transform: translateY(-2px);
+    }
+
+    .health-metrics {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .health-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(6, 11, 26, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: all var(--transition-fast);
+    }
+
+    .health-row:hover {
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateX(2px);
+    }
+
+    .health-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .health-label {
+      font-size: 12px;
+      color: var(--text-soft);
+      font-weight: 500;
+    }
+
+    .health-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #FFFFFF;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .health-meter {
+      height: 5px;
+      border-radius: 999px;
+      background: rgba(4, 7, 18, 0.9);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .health-meter-fill {
+      position: absolute;
+      inset: 0;
+      width: 78%;
+      background: linear-gradient(90deg, var(--meaux-mint), var(--meaux-teal));
+      border-radius: 999px;
+      box-shadow: 0 0 13px rgba(41, 242, 200, 0.8);
+    }
+
+    .health-meter-fill.mid {
+      width: 63%;
+      background: linear-gradient(90deg, var(--meaux-amber), var(--meaux-orange));
+      box-shadow: 0 0 13px rgba(255, 179, 71, 0.8);
+    }
+
+    .health-meter-fill.low {
+      width: 46%;
+      background: linear-gradient(90deg, var(--danger), #FE938C);
+      box-shadow: 0 0 13px rgba(255, 79, 106, 0.8);
+    }
+
+    .panel-footer-note {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* FOOTER */
+    .footer {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer span strong {
+      color: var(--text-soft);
+      font-weight: 700;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .foot-pill {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 6px 12px;
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(5, 9, 20, 0.96);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      font-weight: 500;
+    }
+
+    .foot-pill:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-soft);
+      transform: translateY(-1px);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .nav-actions {
+        width: 100%;
+        justify-content: center;
+      }
+      .hero-badge-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .brand-text {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <!-- NAV -->
+    <header class="nav" aria-label="MeauxStack navigation">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"></div>
+        <div class="brand-text">
+          <div class="brand-line">MeauxStack Internal</div>
+          <div class="brand-name">
+            <span class="meaux">MEAUX</span><span class="stack">STACK OS</span>
+          </div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-pill">
+          <span class="nav-dot"></span>
+          <span>AI-orchestrated • Cloudflare-native</span>
+        </div>
+        <button class="nav-ghost" type="button">
+          Open /dashboard
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN LAYOUT -->
+    <main class="layout">
+      <!-- LEFT: HERO -->
+      <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-badge-row">
+          <div class="hero-badge">
+            <span class="label">MeauxStack Workforce OS</span>
+            <span class="divider"></span>
+            <span>Unify ops, time, people & data in our own stack.</span>
+          </div>
+          <div class="hero-kpi-chip">
+            Current sprint: <strong>Onboarding & Scale v1.3</strong>
+          </div>
+        </div>
+
+        <h1 id="hero-title" class="hero-title">
+          End the manual mess inside <span class="highlight">our own system</span>.
+        </h1>
+
+        <p class="hero-subtitle">
+          MeauxStack turns <strong>Cloudflare, D1, R2 and AI</strong> into a single, opinionated
+          operating system for our projects, clients, and teammates. This page is our
+          internal control room for <strong>onboarding, optimization, and scale</strong>.
+        </p>
+
+        <div class="hero-actions">
+          <button class="btn btn-primary" type="button">
+            Launch MeauxStack Hub
+          </button>
+          <button class="btn btn-ghost" type="button">
+            View Implementation Playbook
+          </button>
+          <div class="btn-pill-sub">
+            <span class="btn-dot"></span>
+            Live environment: <strong>meauxbility.org /dashboard</strong>
+          </div>
+        </div>
+
+        <div class="hero-metrics" aria-label="System metrics">
+          <article class="metric-card">
+            <div class="metric-header">
+              <div class="metric-label">
+                <span class="metric-label-pill">Manual to automated</span>
+              </div>
+              <div class="metric-trend">
+                <span class="arrow">▲</span> +38% workflows automated
+              </div>
+            </div>
+            <div class="metric-value">
+              12.4 hrs / week
+            </div>
+            <div class="metric-meter" aria-hidden="true">
+              <div class="metric-meter-fill"></div>
+            </div>
+            <p class="metric-footer">
+              Estimated time reclaimed across <span>Meauxbility + InnerAnimal</span> this sprint.
+            </p>
+          </article>
+
+          <article class="metric-card">
+            <div class="metric-header">
+              <div class="metric-label">
+                <span>System reliability</span>
+              </div>
+              <div class="metric-value">
+                99.3%
+              </div>
+            </div>
+            <div class="metric-meter" aria-hidden="true">
+              <div class="metric-meter-fill alt"></div>
+            </div>
+            <p class="metric-footer">
+              Routing + Workers + R2 backed by <span>Cloudflare Pro</span>.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- RIGHT: STACK MAP + ONBOARDING -->
+      <aside class="right-column" aria-label="Stack overview">
+        <section class="stack-map">
+          <div class="stack-header">
+            <h2 class="stack-title">MeauxStack Layers</h2>
+            <div class="stack-tag">Cloudflare-only, API-first</div>
+          </div>
+
+          <div class="stack-grid">
+            <article class="stack-block">
+              <div class="stack-block-header">
+                <h3 class="stack-block-title">Foundation</h3>
+                <div class="stack-glyph" aria-hidden="true"></div>
+              </div>
+              <p class="stack-block-body">
+                Zones, Workers, R2, D1 & KV organized per brand. Opinionated naming,
+                consistent bindings, zero GitHub dependency where possible.
+              </p>
+              <div class="stack-tags">
+                <span class="stack-pill">Zones: Meauxbility, InnerAnimal, iAutodidact</span>
+                <span class="stack-pill">Worker router</span>
+              </div>
+            </article>
+
+            <article class="stack-block">
+              <div class="stack-block-header">
+                <h3 class="stack-block-title">Data & Telemetry</h3>
+                <div class="stack-glyph" aria-hidden="true"></div>
+              </div>
+              <p class="stack-block-body">
+                D1 tables for projects, tasks, runs & logs. R2 catalogs for assets +
+                AutoRAG context, wired into MeauxAI + dashboards.
+              </p>
+              <div class="stack-tags">
+                <span class="stack-pill">D1: meaux_projects</span>
+                <span class="stack-pill">R2: autorag-buckets</span>
+              </div>
+            </article>
+
+            <article class="stack-block">
+              <div class="stack-block-header">
+                <h3 class="stack-block-title">Workflows</h3>
+                <div class="stack-glyph" aria-hidden="true"></div>
+              </div>
+              <p class="stack-block-body">
+                Cron-driven jobs, API endpoints, and AI agents that replace manual
+                status checks, exports, and reporting.
+              </p>
+              <div class="stack-tags">
+                <span class="stack-pill">Cron triggers</span>
+                <span class="stack-pill">MeauxAI routines</span>
+              </div>
+            </article>
+
+            <article class="stack-block">
+              <div class="stack-block-header">
+                <h3 class="stack-block-title">Experience</h3>
+                <div class="stack-glyph" aria-hidden="true"></div>
+              </div>
+              <p class="stack-block-body">
+                R2-served HTML dashboards (MeauxAccess, MeauxWork, MeauxLearn)
+                with VisionOS-style UI and inline SVG iconography.
+              </p>
+              <div class="stack-tags">
+                <span class="stack-pill">/dashboard</span>
+                <span class="stack-pill">/meauxaccess</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="onboarding" aria-label="Onboarding and scaling">
+          <div class="onboarding-header">
+            <h2 class="onboarding-title">Onboarding → Optimization → Scale</h2>
+            <div class="onboarding-badge">Current focus: Optimize + Standardize</div>
+          </div>
+
+          <div class="onboarding-steps">
+            <article class="step-card" data-step="01">
+              <div class="step-label">Phase 1 · Stabilize</div>
+              <div class="step-title">Map everything into MeauxStack</div>
+              <p class="step-body">
+                Inventory zones, Workers, R2 buckets and D1 tables. Tag each
+                project, asset and route so MeauxStack has a clean source of truth.
+              </p>
+            </article>
+
+            <article class="step-card" data-step="02">
+              <div class="step-label">Phase 2 · Automate</div>
+              <div class="step-title">Replace manual routines</div>
+              <p class="step-body">
+                For each brand, identify recurring manual work (billing, reporting,
+                image ops, content sync) and move it into Workers + Cron + AI agents.
+              </p>
+            </article>
+
+            <article class="step-card" data-step="03">
+              <div class="step-label">Phase 3 · Scale</div>
+              <div class="step-title">Harden & expose patterns</div>
+              <p class="step-body">
+                Promote the best flows into reusable internal "Meaux Modules" so new
+                clients and apps launch from a proven template instead of from scratch.
+              </p>
+            </article>
+          </div>
+        </section>
+      </aside>
+    </main>
+
+    <!-- LOWER GRID -->
+    <section class="lower-grid" aria-label="Modules and health">
+      <section class="module-panel">
+        <div class="panel-header">
+          <h2 class="panel-title">Core Meaux Modules</h2>
+          <p class="panel-sub">Each module = one repeatable pattern we can scale.</p>
+        </div>
+
+        <div class="module-grid">
+          <article class="module-card">
+            <h3 class="module-name">MeauxWork · Ops & Projects</h3>
+            <p class="module-desc">
+              Worker-served kanban, D1-backed tasks and timelines for every brand.
+              One place to see who shipped what and what's blocked.
+            </p>
+            <div class="module-meta">
+              <span class="module-chip">Bindings: D1_PROJECTS, R2_ASSETS</span>
+              <span class="status-pill active">Active in production</span>
+            </div>
+          </article>
+
+          <article class="module-card">
+            <h3 class="module-name">MeauxAccess · App Launcher</h3>
+            <p class="module-desc">
+              VisionOS-style app library for our internal tools and client portals.
+              R2-stored HTML, zero-Git, Cloudflare routed.
+            </p>
+            <div class="module-meta">
+              <span class="module-chip">Route: /dashboard/apps</span>
+              <span class="status-pill dev">Polishing UI</span>
+            </div>
+          </article>
+
+          <article class="module-card">
+            <h3 class="module-name">MeauxLearn · Playbooks</h3>
+            <p class="module-desc">
+              Cloudflare 101, MeauxStack SOPs, and Prompt Library served as courses
+              so new teammates ramp up fast.
+            </p>
+            <div class="module-meta">
+              <span class="module-chip">R2: meauxlearn-lessons</span>
+              <span class="status-pill dev">Content in progress</span>
+            </div>
+          </article>
+
+          <article class="module-card">
+            <h3 class="module-name">MeauxAI · Internal Agents</h3>
+            <p class="module-desc">
+              Chat + API agents wired into R2 knowledge and D1 context to
+              generate code, content, and ops changes on demand.
+            </p>
+            <div class="module-meta">
+              <span class="module-chip">Workers AI + OpenAI</span>
+              <span class="status-pill idea">Next sprint</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel-secondary">
+        <div class="panel-header">
+          <h2 class="panel-title">System Health & Focus</h2>
+          <p class="panel-sub">Quick read on where to put engineering energy.</p>
+        </div>
+
+        <div class="health-metrics">
+          <div class="health-row">
+            <div class="health-top">
+              <span class="health-label">Onboarding consistency</span>
+              <span class="health-value">78%</span>
+            </div>
+            <div class="health-meter" aria-hidden="true">
+              <div class="health-meter-fill"></div>
+            </div>
+          </div>
+
+          <div class="health-row">
+            <div class="health-top">
+              <span class="health-label">Manual tasks left this month</span>
+              <span class="health-value">23</span>
+            </div>
+            <div class="health-meter" aria-hidden="true">
+              <div class="health-meter-fill mid"></div>
+            </div>
+          </div>
+
+          <div class="health-row">
+            <div class="health-top">
+              <span class="health-label">Critical migrations blocked</span>
+              <span class="health-value">3</span>
+            </div>
+            <div class="health-meter" aria-hidden="true">
+              <div class="health-meter-fill low"></div>
+            </div>
+          </div>
+        </div>
+
+        <p class="panel-footer-note">
+          Use this panel as the "single glance" for standups: if manual tasks spike
+          or migrations stall, we pause new features and stabilize the foundation.
+        </p>
+      </section>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>
+        <strong>MeauxStack OS</strong> · Internal view only · Cloudflare • R2 • D1 • Workers • AI-orchestrated
+      </span>
+      <div class="footer-links">
+        <span class="foot-pill">Open /meauxlearn · Cloudflare 101</span>
+        <span class="foot-pill">Open /promptlibrary</span>
+        <span class="foot-pill">View D1 schema</span>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
