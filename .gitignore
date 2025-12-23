@@ -4,3 +4,7 @@ node_modules/
 *.log
 .env
 .env.local
+.env.*
+*.secret
+*_secret*
+d1_schema.json
