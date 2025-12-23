@@ -8,6 +8,14 @@ binding = "DB"
 database_name = "meauxos"
 database_id = "d8261777-9384-44f7-924d-c92247d55b46"
 
+[[r2_buckets]]
+binding = "AUTORAG_BUCKET"
+bucket_name = "autorag-meauxbility-chatbot"
+
+[[r2_buckets]]
+binding = "INFRA_BUCKET"
+bucket_name = "allinfrastructure"
+
 [env.production]
 name = "iaccess-platform"
 account_id = "ede6590ac0d2fb7daf155b35653457b2"

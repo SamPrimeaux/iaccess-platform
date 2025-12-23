@@ -1,0 +1,48 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "httpUrl": "https://mcp.supabase.com/mcp?project_ref=qmpghmthbhuumemnahcz"
+    },
+    "cloudflare": {
+      "command": "npx",
+      "args": ["-y", "@cloudflare/mcp-server-cloudflare"],
+      "env": {
+        "CLOUDFLARE_API_TOKEN": "meHW2uHn0LohFAEO6nMPWlfJ8L46cUwPOJuJRPB1",
+        "CLOUDFLARE_ACCOUNT_ID": "ede6590ac0d2fb7daf155b35653457b2"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres"],
+      "env": {
+        "POSTGRES_CONNECTION_STRING": "postgresql://postgres.qmpghmthbhuumemnahcz:Thissomebullshit1!%232%23%23%401@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/workspace"]
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"]
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "google-ai": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/mcp-server-google-ai"],
+      "env": {
+        "GOOGLE_API_KEY": "AIzaSyAj3dCoSpXIIaqhN7aUv90KYUmd-2Ep7Mg"
+      }
+    }
+  }
+}
