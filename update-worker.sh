@@ -32,9 +32,20 @@ const worker = '// Multi-page Worker with routing\n' +
   ).join(',\n') +
   '};\n\n' +
   'export default {\n' +
-  '  async fetch(request: Request): Promise<Response> {\n' +
+  '  async fetch(request: Request, env: any, ctx: any): Promise<Response> {\n' +
   '    const url = new URL(request.url);\n' +
   '    let path = url.pathname;\n' +
+  '    \n' +
+  '    // Gemini API Key Check\n' +
+  '    if (path === \"/api/gemini-status\") {\n' +
+  '      return new Response(JSON.stringify({\n' +
+  '        status: \"ok\",\n' +
+  '        hasKey: !!env.GEMINI_API_KEY,\n' +
+  '        message: env.GEMINI_API_KEY ? \"Gemini Key is configured!\" : \"Gemini Key is MISSING. Check .dev.vars or secrets.\"\n' +
+  '      }), {\n' +
+  '        headers: { \"Content-Type\": \"application/json\" }\n' +
+  '      });\n' +
+  '    }\n' +
   '    \n' +
   '    if (path !== \"/\" && path.endsWith(\"/\")) {\n' +
   '      path = path.slice(0, -1);\n' +
